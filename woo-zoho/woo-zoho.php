@@ -2,7 +2,7 @@
 /*
 * Plugin Name: Integration for WooCommerce and Zoho
 * Description: Integrates WooCommerce with Zoho allowing new orders to be automatically sent to your Zoho account.
-* Version: 1.5.0
+* Version: 1.5.1
 * Requires at least: 4.7
 * WC requires at least: 3.0
 * Author: CRM Perks
@@ -24,7 +24,7 @@ class vxc_zoho{
   public $id='vxc_zoho';
   public $domain='vxc-zoho';
   public $crm_name='zoho';
-  public $version = '1.5.0';
+  public $version = '1.5.1';
   public $min_wc_version = '3.0';
   public $update_id = '50003';
   public $type = 'vxc_zoho_pro';

@@ -1842,7 +1842,7 @@ if(method_exists($item,'get_product')){
          $product_simple=new WC_Product($parent_id);
          $parent_sku=$product_simple->get_sku(); 
          if($parent_sku == $sku){
-             $sku.='-'.$product_id;
+           //  $sku.='-'.$product_id; //do not create new zoho product for each woo variation , disabled @ sep-24 ID #38906
          }
      // append variation names ,  $item->get_name() does not support more than 3 variation names
           $attrs=$product->get_attributes(); //$item->get_formatted_meta_data( '' )
