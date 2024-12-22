@@ -128,7 +128,7 @@ public function setup_main(){
   add_action( 'woocommerce_subscription_status_updated',array($this,'status_changed_subscription'), 10, 3 );
   
   add_action( 'woocommerce_checkout_update_order_meta',array($this,'order_submit'), 99, 2 ); 
-  add_action( 'woocommerce_new_order',array($this,'order_submit_new') ); //order_id
+  add_action( 'woocommerce_new_order',array($this,'order_submit_new'),10,2 ); //order_id
   
   add_action('woocommerce_saved_order_items',array($this,'save_lines'),999,2); //update order items 
 
@@ -430,20 +430,20 @@ public function save_lines($id,$items){
   $this->push($id,$status);
       }
   }
-    public function order_submit_new($id){ 
+    public function order_submit_new($id,$order){  
+   if(is_object($order) && method_exists($order,'get_type') && $order->get_type() == 'shop_order'){ //only send orders , NO subscriptions
       if($this->do_actions()){ 
 do_action('vx_addons_save_entry',$id,'','wc','');         
       }
-   if(defined('REST_REQUEST') || is_admin()){ //is_admin() is for new order created manually via woo    
-    $order = new WC_Order( $id );
+   if(defined('REST_REQUEST') || is_admin()){   
     $items = $order->get_items(); 
-   
     if(!empty($items)){  
     self::$order_sent=true;    
-   $this->push($id,'submit');    
+   $this->push($id,'submit');     
     }
    } 
-  }  
+   }
+  }   
   /**
   * Check settings
   * if settings are not complete then ask user to complete settings first
@@ -1434,7 +1434,6 @@ if(!$is_subscription){
   self::$order['_order_id']=$_order->get_order_number(); //get_id();
   } 
 }
-
 
    $order_status=$_order->get_status(); 
    if(!$order_status){  //$order_status=auto-draft  ignore it
