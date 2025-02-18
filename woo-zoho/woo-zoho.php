@@ -2,9 +2,8 @@
 /*
 * Plugin Name: Integration for WooCommerce and Zoho
 * Description: Integrates WooCommerce with Zoho allowing new orders to be automatically sent to your Zoho account.
-* Version: 1.5.2
+* Version: 1.5.3
 * Requires at least: 4.7
-* WC requires at least: 3.0
 * Author: CRM Perks
 * Author URI: https://www.crmperks.com
 * Plugin URI: https://www.crmperks.com/plugins/woocommerce-plugins/woocommerce-zoho-plugin/
@@ -24,7 +23,7 @@ class vxc_zoho{
   public $id='vxc_zoho';
   public $domain='vxc-zoho';
   public $crm_name='zoho';
-  public $version = '1.5.2';
+  public $version = '1.5.3';
   public $min_wc_version = '3.0';
   public $update_id = '50003';
   public $type = 'vxc_zoho_pro';
@@ -128,7 +127,7 @@ public function setup_main(){
   add_action( 'woocommerce_subscription_status_updated',array($this,'status_changed_subscription'), 10, 3 );
   
   add_action( 'woocommerce_checkout_update_order_meta',array($this,'order_submit'), 99, 2 ); 
-  add_action( 'woocommerce_new_order',array($this,'order_submit_new') ); //order_id
+  add_action( 'woocommerce_new_order',array($this,'order_submit_new'),10,2 ); //order_id
   
   add_action('woocommerce_saved_order_items',array($this,'save_lines'),999,2); //update order items 
 
@@ -379,7 +378,6 @@ public function save_product($post_id,$product=''){
   //if(empty($product)){
    $product=wc_get_product($post_id);
   //} 
- //var_dump($product); die('------------------');
   if( is_object($product)  && method_exists($product,'get_status') && $product->get_status() == 'publish' && !in_array($product->get_type(),array('variable')) ){ 
 //do not run with cron becuase our pluin's sync cron creates new zoho product in woo , which is again sent to zoho
 $res=$this->push($post_id,'save_product');
@@ -430,20 +428,20 @@ public function save_lines($id,$items){
   $this->push($id,$status);
       }
   }
-    public function order_submit_new($id){ 
+    public function order_submit_new($id,$order){  
+   if(is_object($order) && method_exists($order,'get_type') && $order->get_type() == 'shop_order'){ //only send orders , NO subscriptions
       if($this->do_actions()){ 
 do_action('vx_addons_save_entry',$id,'','wc','');         
       }
-   if(defined('REST_REQUEST') || is_admin()){ //is_admin() is for new order created manually via woo    
-    $order = new WC_Order( $id );
+   if(defined('REST_REQUEST') || is_admin()){   
     $items = $order->get_items(); 
-   
     if(!empty($items)){  
     self::$order_sent=true;    
-   $this->push($id,'submit');    
+   $this->push($id,'submit');     
     }
    } 
-  }  
+   }
+  }   
   /**
   * Check settings
   * if settings are not complete then ask user to complete settings first
@@ -1321,8 +1319,7 @@ return $results;
   * @param mixed $status
   */
   public function push($order_id,$status="user",$log=array()){ 
-
-        
+   
       global $post_id;
   $log_id=''; self::$processing_feed=true; 
   if(is_array($log) && !empty($log)){
@@ -1434,7 +1431,6 @@ if(!$is_subscription){
   self::$order['_order_id']=$_order->get_order_number(); //get_id();
   } 
 }
-
 
    $order_status=$_order->get_status(); 
    if(!$order_status){  //$order_status=auto-draft  ignore it
@@ -2060,7 +2056,7 @@ else{ // general fields
   }
 }
 
-} 
+}
   if(is_array($value)){  
   $value=implode("; ",$value);    
   }    

@@ -596,6 +596,9 @@ if(!empty($v['placeholder'])){ $label=$v['placeholder']; }
        $ship_fields['_shipping_country']=array('label'=>'Shipping Country');   
        $ship_fields['_shipping_compnay']=array('label'=>'Shipping Company');
       }
+      if(!isset($ship_fields['_shipping_phone'])){
+          $ship_fields['_shipping_phone']=array('label'=>'Shipping Phone');
+      }
   $gen_fields=array(
   '_order_date'=>array('label'=>'Order Date'),
   '_order_id'=>array('label'=>'Order ID'),
@@ -664,7 +667,7 @@ if(!empty($v['placeholder'])){ $label=$v['placeholder']; }
   
     $txs=wc_get_attribute_taxonomies();
   $tx_arr=array();
-  $product_attrs=array('title'=>'Product Title','description'=>'Product Description','short_description'=>'Short Description','sku'=>'Product SKU','price'=>'Product Price','regular_price'=>'Product Regular Price','sale_price'=>'Product Sales Price','total_sales'=>'Product Total Sales','stock_quantity'=>'Stock Quantity','weight'=>'Product Weight','length'=>'Product Length','width'=>'Product Width','height'=>'Product Height','get_category_ids'=>'Product Categories','get_category'=>'Product First Category','get_tags'=>'Product Tags','get_tag'=>'Product First Tag','product_img'=>'Product Image URL');
+  $product_attrs=array('title'=>'Product Title','description'=>'Product Description','short_description'=>'Short Description','sku'=>'Product SKU','price'=>'Product Price','regular_price'=>'Product Regular Price','sale_price'=>'Product Sales Price','total_sales'=>'Product Total Sales','stock_quantity'=>'Stock Quantity','weight'=>'Product Weight','length'=>'Product Length','width'=>'Product Width','height'=>'Product Height','get_category_ids'=>'Product Categories','get_category'=>'Product First Category','get_tags'=>'Product Tags','get_tag'=>'Product First Tag','product_img'=>'Product Image URL','id'=>'ID');
   
   foreach($product_attrs as $k=>$v){
       $tx_arr['__vxp_fun-'.$k]=array('label'=>$v);

@@ -356,6 +356,7 @@ foreach($arr as $v){
       foreach($res['taxes'] as $vv){
    $ops[]=array('label'=>$vv['tax_name'],'value'=>$vv['tax_id']);       
       }
+     $field['label'].=' - Default Tax';    
      $field['options']=$ops;    
    $field['type']='list';   
    }    
@@ -919,8 +920,14 @@ $post[$field_name][]=$item_arr; //Discount , Tax
 if(!empty($post['vx_ship_entry'])){
     
       $ship_line=array($product_name=>array('id'=>$post['vx_ship_entry']),'Quantity'=>1,'List_Price'=>floatval($post['shipping_charge']));
+    if(isset($post['vx_ship_entry_tax'])){
     if(!empty($post['vx_ship_entry_tax'])){
      $ship_line['Tax']=$post['vx_ship_entry_tax'];   
+    }}else{ //if tax field not mapped , try getting tax from shipping line
+        $zoho_tax=$this->find_zoho_tax_ship($meta);
+if($zoho_tax !== false){
+   $ship_line['Tax']=$zoho_tax;  
+}   
     }
     if(isset($old_lines[$post['vx_ship_entry']])){
          $ship_line['id']=$old_lines[$post['vx_ship_entry']];
@@ -1531,7 +1538,7 @@ if(!empty($meta['invoice_check']) && !empty($meta['object_invoice']) &&  !empty(
    $fields['invoice_id']=array('label'=>'Invoice ID','value'=>self::$feeds_res[$meta['object_invoice']]['id']);
 } 
 
-if(!empty($meta['order_items']) && !$disable_items){
+if(!empty($meta['order_items']) && !$disable_items){ 
    $order_res=$this->get_zoho_products_invoice($meta); 
    $zoho_products=$order_res['res']; 
    if(isset($order_res['count']) && !empty($zoho_products) && $order_res['count'] > count($zoho_products)){ //if some item failed , do not process order
@@ -1573,6 +1580,8 @@ if(!empty($meta['order_items']) && !$disable_items){
   $line_item['rate']=round(floatval($line_item['rate']),2);
  if(!empty($v['tax_id'])){
      $line_item['tax_id']=$v['tax_id'];
+ }else if(!empty($meta['tax_id']) && $meta['tax_id'] == 'map' && !empty($post['tax_id'])){ //if default tax field mapped and no tax found from tax mapping - for error interstate order needs tax
+     $line_item['tax_id']=$post['tax_id'];
  } 
  if(!empty($post['pricebook_id'])){
      $line_item['pricebook_id']=$post['pricebook_id'];
@@ -1586,8 +1595,16 @@ $post['line_items'][]= $line_item;
 //$extra['line items']=$post['line_items'];
 if(!empty($post['vx_ship_entry'])){
     $ship_line=array('item_id'=>$post['vx_ship_entry'],'quantity'=>1,'rate'=>floatval($post['shipping_charge'])); 
+
+    if(isset($post['vx_ship_entry_tax'])){
     if(!empty($post['vx_ship_entry_tax'])){
      $ship_line['tax_id']=$post['vx_ship_entry_tax'];   
+    }
+    }else{ //if tax field not mapped , try getting tax from shipping
+        $zoho_tax=$this->find_zoho_tax_ship($meta);
+if($zoho_tax !== false){
+   $ship_line['tax_id']=$zoho_tax;  
+}   
     }
  $post['line_items'][]=$ship_line;
   
@@ -1799,6 +1816,7 @@ public function get_wc_items($meta){
 if(is_array($items) && count($items)>0 ){
 foreach($items as $item_id=>$item){
 
+ //var_dump($item->get_taxes());
 $sku=$img_id=$cat=''; $qty=$unit_price=$tax=$total=$cost=$cost_woo=$stock=0;
 if(method_exists($item,'get_product')){
   // $p_id=$v->get_product_id();  
@@ -1843,7 +1861,7 @@ if(method_exists($item,'get_product')){
    if(!empty($parent_id)){
          $product_simple=new WC_Product($parent_id);
          $parent_sku=$product_simple->get_sku(); 
-         if($parent_sku == $sku){
+         if($parent_sku == $sku){ //no new SKU for woo variation
            //  $sku.='-'.$product_id; //do not create new zoho product for each woo variation , disabled @ sep-24 ID #38906
          }
      // append variation names ,  $item->get_name() does not support more than 3 variation names
@@ -1897,19 +1915,9 @@ if(method_exists($item,'get_product')){
    $temp['stock']=$product->get_stock_quantity();
    if(!empty($meta['tax_id'])){
 if($meta['tax_id'] == 'map'){    
-$item_tax=$item->get_taxes(); //var_dump($item_tax); die();
-if(!empty($item_tax['total']) && !empty($meta['tax_map'])){
-$tax_ids=$item_tax['total'];
-$tax_class=$item->get_tax_class();
-if(empty($tax_class)){ $tax_class='standard'; }
-    $tax_ids+=array($tax_class=>'tax Class'); 
-    foreach($tax_ids as $tax_id=>$tax_val){
-        $tax_rate=array_search($tax_id,$meta['tax_map']);
-        if($tax_rate){ 
-         $temp['tax_id']=$tax_rate;   
-            break;
-        }
-    }   
+$zoho_tax=$this->find_zoho_tax($item, $meta);
+if($zoho_tax !== false){
+   $temp['tax_id']=$zoho_tax;  
 }
 //var_dump($item_tax['total'],$meta['tax_map'],$temp); die();
 }else{
@@ -1934,9 +1942,38 @@ if(!empty($meta['item_desc'])){
      $order_items[]=$temp;     
       }
      } 
- // var_dump($order_items); die();   
+ //var_dump($order_items); die();   
    return $order_items;       
 }
+public function find_zoho_tax_ship($meta){
+    $zoho_tax=false;
+if(!empty($meta['tax_id']) && $meta['tax_id'] == 'map' && is_object(self::$_order) && method_exists(self::$_order,'get_items')){  
+    $ship_items=self::$_order->get_items('shipping'); // 
+$ship_item=reset($ship_items);
+if($ship_item !== false){
+$zoho_tax=$this->find_zoho_tax($ship_item, $meta); 
+}  
+}
+return $zoho_tax;
+}
+public function find_zoho_tax($item, $meta){
+  $item_tax=$item->get_taxes(); 
+  $zoho_tax=false;
+if(!empty($item_tax['total']) && !empty($meta['tax_map'])){
+$tax_ids=$item_tax['total'];
+$tax_class=$item->get_tax_class();
+if(empty($tax_class)){ $tax_class='standard'; }
+    $tax_ids+=array($tax_class=>'tax Class'); 
+    foreach($tax_ids as $tax_id=>$tax_val){
+        $tax_rate=array_search($tax_id,$meta['tax_map']);
+        if($tax_rate){ 
+         $zoho_tax=$tax_rate;   
+            break;
+        }
+    }   
+} 
+return $zoho_tax; 
+} 
 public function get_zoho_products($meta){ 
 
      $sales_response=array();  $extra=array();
@@ -1981,7 +2018,7 @@ if(!empty($cat)){
  $fields['Product_Category']=$cat;   
 } 
 if(!empty($tax_id)){
- $fields['Tax']=$tax_id;   
+ $fields['Tax']=array_map(function($val){return array('value'=>$val);}, explode(',',$tax_id));   
 }
 $post=json_encode(array('data'=>array($fields)));
 $arr=$this->post_crm('Products','post',$post); 

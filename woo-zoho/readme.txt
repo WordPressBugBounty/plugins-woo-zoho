@@ -2,11 +2,11 @@
 Contributors: crmperks, sbazzi, asif876
 Tags: zoho, woocommerce zoho, zoho books, zoho invoice, zoho inventory
 Requires at least: 4.7
-Tested up to: 6.6
-Stable tag: 1.5.2
-Version: 1.5.2
+Tested up to: 6.7
+Stable tag: 1.5.3
+Version: 1.5.3
 WC requires at least: 3.0
-WC tested up to: 9.3
+WC tested up to: 9.6
 Requires PHP: 5.3
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -174,8 +174,13 @@ This free zoho crm woocommerce plugin can create/update any object(contact,accou
 == Changelog ==
 
 
+= 1.5.3 =
+* added "phone and product ID" fields.
+
 = 1.5.2 =
 * fixed "products search exact match" issue.
+* fixed "invalid tax when auto creating product with Order lines" issue.
+* added "map shipping tax to zoho" feature.
 
 = 1.5.1 =
 * fixed "do not create new zoho product for woo variation" issue.
