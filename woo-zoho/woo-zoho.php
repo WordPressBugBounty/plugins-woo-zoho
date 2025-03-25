@@ -2,7 +2,7 @@
 /*
 * Plugin Name: Integration for WooCommerce and Zoho
 * Description: Integrates WooCommerce with Zoho allowing new orders to be automatically sent to your Zoho account.
-* Version: 1.5.3
+* Version: 1.5.4
 * Requires at least: 4.7
 * Author: CRM Perks
 * Author URI: https://www.crmperks.com
@@ -23,7 +23,7 @@ class vxc_zoho{
   public $id='vxc_zoho';
   public $domain='vxc-zoho';
   public $crm_name='zoho';
-  public $version = '1.5.3';
+  public $version = '1.5.4';
   public $min_wc_version = '3.0';
   public $update_id = '50003';
   public $type = 'vxc_zoho_pro';
@@ -1744,14 +1744,14 @@ $this->send_error_email($order_id,$info,$res);
   } 
   //   $settings=get_option($this->type.'_settings',array());
   //insert log
-//  if($this->post('disable_log',$settings) !="yes"){
+ if($this->post('disable_log',$settings) !="yes"){
   $arr=array("object"=>$feed["object"],"order_id"=>$order_id,"crm_id"=>$this->post('id',$res),"meta"=>$this->post('error',$res),"time"=>date('Y-m-d H:i:s'),"status"=>$this->post('status',$res),"link"=>$this->post('link',$res),"data"=>$this->post('data',$res),"response"=>$this->post('response',$res),"extra"=>$this->post('extra',$res),"feed_id"=>$id,'parent_id'=>$parent_id,'event'=>$status); 
 
   $log_id_i=$this->__log($arr,$log_id);
   if($log_id_i!=""){ //   
   $res['log_id']=$log_id_i;
   } 
- // }
+  }
 
   $note_text=$this->format_note($res,true); 
   if($notice!=""){

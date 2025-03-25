@@ -68,7 +68,13 @@ esc_html_e("Edit",'woo-zoho');
 <label for="vx_plugin_data"><input type="checkbox" name="meta[plugin_data]" value="yes" <?php if($this->post('plugin_data',$meta) == "yes"){echo 'checked="checked"';} ?> id="vx_plugin_data"><?php esc_html_e('On deleting this plugin remove all of its data','woo-zoho'); ?></label>
   </td>
   </tr>
-
+     <tr>
+  <th scope="row"><label for="vx_plugin_logs"><?php esc_html_e('Zoho Logs', 'woo-zoho'); ?></label>
+  </th>
+  <td>
+<label for="vx_plugin_logs"><input type="checkbox" name="meta[disable_log]" value="yes" <?php if($this->post('disable_log',$meta) == "yes"){echo 'checked="checked"';} ?> id="vx_plugin_logs"><?php esc_html_e('Disable Storing Zoho Logs','woo-zoho'); ?></label>
+  </td>
+  </tr>
 <tr>
 <th><label for="update_meta"><?php esc_html_e("Update Order",'woo-zoho');  ?></label></th>
 <td><label for="update_meta"><input type="checkbox" id="update_meta" name="meta[update]" value="yes" <?php if($this->post('update',$meta) == "yes"){echo 'checked="checked"';} ?> ><?php esc_html_e("Send order data to Zoho when updated in WooCommerce",'woo-zoho');  ?></label></td>

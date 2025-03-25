@@ -1213,7 +1213,6 @@ public function send_order_admin($post_id,$post_type=''){
   public function log_page(){ 
 
    wp_enqueue_style('vxc-css');
-
     global $wpdb;
    $bulk_action=$this->post('bulk_action');
     $offset=$this->time_offset();
