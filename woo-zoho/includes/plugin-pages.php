@@ -1218,6 +1218,7 @@ public function send_order_admin($post_id,$post_type=''){
     $offset=$this->time_offset();
    $log_ids=array();
   if($bulk_action!=""){
+      check_admin_referer('vx_nonce','vx_nonce');
    $log_id=$this->post('log_id');  
    $table=$this->get_table_name(); 
    if(is_array($log_id) && count($log_id)>0){
@@ -1531,7 +1532,7 @@ if($check && !empty($info)){
   else{
   $info['class']="";  
   if(!empty($info['instance_url'])){
-  $info['msg']=!empty($info['zoho_error']) ? $info['zoho_error'] : 'API Token is Not Valid'; 
+  $info['msg']=!empty($info['error']) ? $info['error'] : 'API Token is Not Valid'; 
   $info['class']="error"; 
   }       }
   

@@ -2,11 +2,11 @@
 Contributors: crmperks, sbazzi, asif876
 Tags: zoho, woocommerce zoho, zoho books, zoho invoice, zoho inventory
 Requires at least: 4.7
-Tested up to: 6.7
-Stable tag: 1.5.4
-Version: 1.5.4
+Tested up to: 6.8
+Stable tag: 1.5.5
+Version: 1.5.5
 WC requires at least: 3.0
-WC tested up to: 9.7
+WC tested up to: 9.9
 Requires PHP: 5.3
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -173,6 +173,9 @@ This free zoho crm woocommerce plugin can create/update any object(contact,accou
 
 == Changelog ==
 
+
+= 1.5.5 =
+* fixed "CSRF issue with logs page".
 
 = 1.5.4 =
 * added "disable logs" feature.

@@ -2,7 +2,7 @@
 /*
 * Plugin Name: Integration for WooCommerce and Zoho
 * Description: Integrates WooCommerce with Zoho allowing new orders to be automatically sent to your Zoho account.
-* Version: 1.5.4
+* Version: 1.5.5
 * Requires at least: 4.7
 * Author: CRM Perks
 * Author URI: https://www.crmperks.com
@@ -23,7 +23,7 @@ class vxc_zoho{
   public $id='vxc_zoho';
   public $domain='vxc-zoho';
   public $crm_name='zoho';
-  public $version = '1.5.4';
+  public $version = '1.5.5';
   public $min_wc_version = '3.0';
   public $update_id = '50003';
   public $type = 'vxc_zoho_pro';
@@ -2094,12 +2094,14 @@ public function get_booking_ids_from_order_item_id( $order_item_id ) {
   }
   public function get_warehouses($info){
     $api=$this->get_api($info);
-$res=$api->post_crm('settings/warehouses');
-
+$res=$api->post_crm('locations');
+//var_dump($res);
 $wares=array();
-if(!empty($res['warehouses'])){
-    foreach($res['warehouses'] as $v){
- $wares[$v['warehouse_id']]=$v['warehouse_name'];       
+if(!empty($res['locations'])){
+    foreach($res['locations'] as $v){
+      $loc_id=$v['location_id'];
+      $loc_id.='_'.$v['parent_location_id'];    
+ $wares[$loc_id]=$v['location_name'];       
     }
 } 
 $meta=isset($info['meta']) && is_array($info['meta']) ? $info['meta'] : array();   

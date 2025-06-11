@@ -36,7 +36,7 @@ public function get_token(){
     if(is_array($users) && count($users)>0){
     $info['valid_token']='true';    
     }else{
-        $info['zoho_error']=$users;
+        $info['error']=$users;
       unset($info['valid_token']);  
     }
 return $info;
@@ -1147,7 +1147,6 @@ public function verify_files($files,$old=array()){
   return $files;  
 }
 public function push_object_invoice($module,$fields,$meta){ 
-   
   /*  $json='{"notes":"touseefcccddxx ahmadhcccs localhost.com","reference_number":"wc-10795","place_of_supply":"WB","gst_treatment":"business_gst","gst_no":"19AAGFG0836Q1ZW","reason":"Sales Return","customer_id":"552210000000014002","line_items":[{"item_id":"552210000000016011","quantity":2,"rate":200,"tax_id":"552210000000018131"}],"reference_invoice_type":"registered"}';
 $post=json_decode($json,1);
 $post=array('JSONString'=>json_encode($post));
@@ -1551,12 +1550,21 @@ if(!empty($meta['order_items']) && !$disable_items){
 //var_dump($zoho_products); die();
 
  if(is_array($zoho_products) && count($zoho_products)>0){
-
+  if(!empty($meta['warehouse'])){
+      $p_loc=$meta['warehouse'];
+      $w_arr=explode('_',$meta['warehouse']);  //locID_parentID , post accepts parent and line accepts loc , both can be same
+      if(isset($w_arr[1])){
+     $meta['warehouse']=$w_arr[0];    
+     $p_loc=$w_arr[1];    
+      }
+    $post['location_id']=$p_loc; 
+    $fields['location_id']=array('label'=>'Parent Location','value'=>$p_loc);  
+  }
  foreach($zoho_products as $v){
  $line_item=array('item_id'=>$v['id'],'quantity'=>$v['qty'],'rate'=>$v['cost']);
 // $line_item['rate']=1.98;
   if(!empty($meta['warehouse'])){
-    $line_item['warehouse_id']=$meta['warehouse'];   
+    $line_item['location_id']=$meta['warehouse'];   
   }
   if(!empty($v['description'])){
     $line_item['description']=$v['description'];   
@@ -1745,6 +1753,7 @@ $status='';
 }
 if(!empty($id)){
    $domain=!empty($this->info['dc']) ? $this->info['dc'] : 'com'; 
+   
    // $link='https://crm.zoho.'.$domain.'/crm/EntityInfo.do?module='.$module."&id=".$id; 
    $type=$this->info['type'] == 'invoices' ? 'invoice' : $this->info['type'];
    $module_url=str_replace('_','',$module);
@@ -1757,7 +1766,10 @@ if(!empty($id)){
     if( $type == 'inventory' && $module == 'items'){
      $module_url='inventory/items';  
    }
-    $link='https://'.$type.'.zoho.'.$domain.'/app#/'.$module_url.'/'.$id; 
+   $zoho_domain='zoho';
+   if($domain == 'ca'){$zoho_domain='zohocloud';}
+   
+    $link='https://'.$type.'.'.$zoho_domain.'.'.$domain.'/app#/'.$module_url.'/'.$id; 
 }
 
 return array("error"=>$error,"id"=>$id,"link"=>$link,"action"=>$action,"status"=>$status,"data"=>$fields,"response"=>$arr,"extra"=>$extra);
@@ -2266,7 +2278,7 @@ $args=array(
   'headers' => $header,
  'body' => $body
   );
-$response = wp_remote_request( $path , $args);  
+$response = wp_remote_request( $path , $args); 
 //if($method != 'get'){
    // var_dump($header); //die();
 //}
