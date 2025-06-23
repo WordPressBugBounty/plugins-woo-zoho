@@ -1245,7 +1245,7 @@ if(isset($meta['primary_key']) && $meta['primary_key']!="" && isset($fields[$met
 $search=$fields[$meta['primary_key']]['value'];
 $field=$meta['primary_key'];
 $field_type= isset($custom_fields[$field]['type']) ? $custom_fields[$field]['type'] : '';
-if(!in_array($field,array('email','phone','contact_name','company_name','first_name','last_name'))){
+if(!in_array($field,array('email','phone','contact_name','company_name','first_name','last_name','sku'))){
 if($this->is_address($field)){
   $field='address';   
 }else{
