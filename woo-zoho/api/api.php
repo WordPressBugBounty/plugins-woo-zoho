@@ -1557,14 +1557,15 @@ if(!empty($meta['order_items']) && !$disable_items){
      $meta['warehouse']=$w_arr[0];    
      $p_loc=$w_arr[1];    
       }
-    $post['location_id']=$p_loc; 
-    $fields['location_id']=array('label'=>'Parent Location','value'=>$p_loc);  
+     $loc_key=!empty($meta['warehouse_id']) ? 'warehouse_id' : 'location_id';
+    $post[$loc_key]=$p_loc; 
+    $fields[$loc_key]=array('label'=>'Parent Location','value'=>$p_loc);  
   }
  foreach($zoho_products as $v){
  $line_item=array('item_id'=>$v['id'],'quantity'=>$v['qty'],'rate'=>$v['cost']);
 // $line_item['rate']=1.98;
   if(!empty($meta['warehouse'])){
-    $line_item['location_id']=$meta['warehouse'];   
+    $line_item[$loc_key]=$meta['warehouse'];   
   }
   if(!empty($v['description'])){
     $line_item['description']=$v['description'];   
@@ -2226,7 +2227,7 @@ if($this->info['type'] =='invoices'){
  $path='https://www.zohoapis.'.$dc.'/invoice/v3/'.$path;   
 }else if($this->info['type'] =='books'){
  //$path='https://books.'.$zoho.$dc.'/api/v3/'.$path;   
- $path='https://www.zohoapis.'.$dc.'/books/v3/'.$path;   
+ $path='https://www.zohoapis.'.$dc.'/books/v3/'.$path;//'?organization_id=663936327';   
 }else if($this->info['type'] == 'inventory'){
  //$path='https://inventory.'.$zoho.$dc.'/api/v1/'.$path;   
  $path='https://www.zohoapis.'.$dc.'/inventory/v1/'.$path;  //https://www.zohoapis.ca/inventory/ works 
