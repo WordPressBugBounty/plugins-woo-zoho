@@ -31,7 +31,7 @@ function __construct($info) {
 }
 public function get_token(){
     $users=$this->get_users();
- 
+
     $info=$this->info;
     if(is_array($users) && count($users)>0){
     $info['valid_token']='true';    
@@ -324,7 +324,7 @@ $json['invoices']='["reference_number","place_of_supply","gst_treatment","gst_no
     
  $json['customerpayments']='["payment_mode","amount","date","reference_number","description","exchange_rate","bank_charges","account_id","tax_account_id","branch_id","send_paid_invoice_to"]';
  
- $json['items']='["name","sku","rate","description","description","unit","product_type","item_type","initial_stock","initial_stock_rate","is_taxable","tax_id","avatax_tax_code","avatax_use_code","hsn_or_sac","tax_specification","upc","ean","isbn","part_number","pricebook_rate","purchase_rate","reorder_level","purchase_description","inventory_account_id","purchase_account_id"]';
+ $json['items']='["name","sku","rate","description","description","unit","product_type","item_type","initial_stock","initial_stock_rate","is_taxable","tax_id","avatax_tax_code","avatax_use_code","hsn_or_sac","tax_specification","upc","ean","isbn","part_number","pricebook_rate","purchase_rate","reorder_level","purchase_description","inventory_account_id","purchase_account_id","account_id"]';
   
   $module_a=$module;
    if( in_array($module, array('recurringinvoices1','creditnotes'))){
@@ -898,12 +898,7 @@ if(in_array($module,array('Sales_Orders','Purchase_Orders','Invoices','Quotes'))
      }
 $item_arr['List_Price']=round($item_arr['List_Price'],2);
 if(!empty($v['tax_id'])){
-    $t_arr=explode(' - ',$v['tax_id']);
-    if(is_array($t_arr) && count($t_arr)>1){
-    preg_match("|\d+|", $t_arr[1], $int);
-    if(isset($int[0]) && !empty($int[0])){
-    $item_arr['Line_Tax'][]=array('name'=>trim($t_arr[0]),'percentage'=>floatval($int[0]));     
-    } }
+$item_arr=$this->add_line_tax($item_arr,$v['tax_id']);
 }
     if(!empty($v['fields'])){
         foreach($v['fields'] as $kk=>$vv){
@@ -920,15 +915,19 @@ $post[$field_name][]=$item_arr; //Discount , Tax
 if(!empty($post['vx_ship_entry'])){
     
       $ship_line=array($product_name=>array('id'=>$post['vx_ship_entry']),'Quantity'=>1,'List_Price'=>floatval($post['shipping_charge']));
+      $ship_tax='';
     if(isset($post['vx_ship_entry_tax'])){
     if(!empty($post['vx_ship_entry_tax'])){
-     $ship_line['Tax']=$post['vx_ship_entry_tax'];   
+     $ship_tax=$post['vx_ship_entry_tax'];     
     }}else{ //if tax field not mapped , try getting tax from shipping line
         $zoho_tax=$this->find_zoho_tax_ship($meta);
 if($zoho_tax !== false){
-   $ship_line['Tax']=$zoho_tax;  
+   $ship_tax=$zoho_tax;  
 }   
     }
+ if(!empty($ship_tax)){
+     $ship_line=$this->add_line_tax($ship_line,$ship_tax);
+ }   
     if(isset($old_lines[$post['vx_ship_entry']])){
          $ship_line['id']=$old_lines[$post['vx_ship_entry']];
          unset($old_lines[$post['vx_ship_entry']]);
@@ -1090,6 +1089,15 @@ $note_response=$this->post_note($entry_note,$module);
 
 
 return array("error"=>$error,"id"=>$id,"link"=>$link,"action"=>$action,"status"=>$status,"data"=>$fields,"response"=>$arr,"extra"=>$extra);
+}
+public function add_line_tax($item_arr,$tax_id){
+        $t_arr=explode(' - ',$tax_id);
+    if(is_array($t_arr) && count($t_arr)>1){
+    preg_match("|\d+|", $t_arr[1], $int);
+    if(isset($int[0]) && !empty($int[0])){
+    $item_arr['Line_Tax'][]=array('name'=>trim($t_arr[0]),'percentage'=>floatval($int[0]));     
+    } }
+ return $item_arr;   
 }
 public function is_address($field){
  $is_address=false;

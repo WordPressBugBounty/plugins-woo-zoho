@@ -2,7 +2,7 @@
 /*
 * Plugin Name: Integration for WooCommerce and Zoho
 * Description: Integrates WooCommerce with Zoho allowing new orders to be automatically sent to your Zoho account.
-* Version: 1.5.7
+* Version: 1.5.8
 * Requires at least: 4.7
 * Author: CRM Perks
 * Author URI: https://www.crmperks.com
@@ -23,7 +23,7 @@ class vxc_zoho{
   public $id='vxc_zoho';
   public $domain='vxc-zoho';
   public $crm_name='zoho';
-  public $version = '1.5.7';
+  public $version = '1.5.8';
   public $min_wc_version = '3.0';
   public $update_id = '50003';
   public $type = 'vxc_zoho_pro';
@@ -64,8 +64,6 @@ register_activation_hook(__FILE__,(array($this,'activate')));
 }
 
 public function init(){ 
-   
-
   // $order=wc_get_order(24); $a=$order->get_meta('_completed_date');  var_dump($a);  die();      //$a=$order->get_total();
    //$product=wc_get_product(17987); $a=$product->get_tag_ids(); $term = get_term( 456, 'product_tag' );var_dump($arr);  die();
   self::$wc_status= $this->wc_status();
@@ -119,7 +117,7 @@ die();*/
 
 
 public function setup_main(){
-    
+
       //add_action('woocommerce_update_product',array($this,'save'));
    // hook into woocommerce order status changed hook to handle the desired subscription event trigger
   add_action( 'woocommerce_order_status_changed',array($this,'status_changed'), 10, 3 );
@@ -1742,7 +1740,7 @@ self::$feeds_res[$id]=$res;
   if(isset($res['error']) && $res['error']!="" && !is_admin()){
 $this->send_error_email($order_id,$info,$res);
   } 
-  //   $settings=get_option($this->type.'_settings',array());
+    $settings=get_option($this->type.'_settings',array());
   //insert log
  if($this->post('disable_log',$settings) !="yes"){
   $arr=array("object"=>$feed["object"],"order_id"=>$order_id,"crm_id"=>$this->post('id',$res),"meta"=>$this->post('error',$res),"time"=>date('Y-m-d H:i:s'),"status"=>$this->post('status',$res),"link"=>$this->post('link',$res),"data"=>$this->post('data',$res),"response"=>$this->post('response',$res),"extra"=>$this->post('extra',$res),"feed_id"=>$id,'parent_id'=>$parent_id,'event'=>$status); 
@@ -1889,8 +1887,13 @@ else if(strpos($f_key,"__vxp") === 0 && !empty($item) ){
        if(is_object($product) && method_exists($product,'get_attributes')){
       if($f_key_type == '__vxp_fun-'){
           $fun='get_'.$f_key; 
-            if(in_array($f_key,array('get_category_ids','get_category','get_tags','get_tag'))){
-             $term_type=strpos($f_key,'tag') !== false ? 'product_tag' : 'product_cat';  
+            if(in_array($f_key,array('get_category_ids','get_category','get_tags','get_tag','get_brands','get_brand'))){
+             $term_type='product_cat';  
+             if(strpos($f_key,'tag') !== false){
+              $term_type='product_tag';   
+             }else if(strpos($f_key,'brand') !== false){
+              $term_type='product_brand';   
+             }
            $terms = wp_get_post_terms( $p_id, $term_type ); //product_tag
            $val_temp=array(''); 
            if($terms){
@@ -1899,7 +1902,7 @@ else if(strpos($f_key,"__vxp") === 0 && !empty($item) ){
                $val_temp[]=$term->name;   
                }
            } 
-           if(in_array($f_key,array('get_category','get_tag'))){
+           if(in_array($f_key,array('get_category','get_tag','product_brand'))){
                $value=$val_temp[0];
            }else{
            $value=implode(', ',$val_temp);
@@ -2096,7 +2099,6 @@ public function get_booking_ids_from_order_item_id( $order_item_id ) {
     $api=$this->get_api($info);
 $res=$api->post_crm('locations');
 //$res=$api->post_crm('organizations');
-//$res=$api->post_crm('settings/warehouses');
 //var_dump($res);
 $wares=array();
 if(!empty($res['locations'])){
@@ -2105,6 +2107,13 @@ if(!empty($res['locations'])){
       $loc_id.='_'.$v['parent_location_id'];    
  $wares[$loc_id]=$v['location_name'];       
     }
+}else{
+    $res=$api->post_crm('settings/warehouses');
+    if(!empty($res['warehouses'])){
+    foreach($res['warehouses'] as $v){
+ $wares[$v['warehouse_id']]=$v['warehouse_name'];       
+    }
+}
 } 
 $meta=isset($info['meta']) && is_array($info['meta']) ? $info['meta'] : array();   
 $meta['warehouses']=$wares;

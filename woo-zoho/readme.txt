@@ -3,10 +3,10 @@ Contributors: crmperks, sbazzi, asif876
 Tags: zoho, woocommerce zoho, zoho books, zoho invoice, zoho inventory
 Requires at least: 4.7
 Tested up to: 6.8
-Stable tag: 1.5.7
-Version: 1.5.7
+Stable tag: 1.5.8
+Version: 1.5.8
 WC requires at least: 3.0
-WC tested up to: 10.0
+WC tested up to: 10.1
 Requires PHP: 5.3
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -173,6 +173,9 @@ This free zoho crm woocommerce plugin can create/update any object(contact,accou
 
 == Changelog ==
 
+
+= 1.5.8 =
+* fixed "shipping tax" issue.
 
 = 1.5.7 =
 * fixed "invalid location_id element" issue.

@@ -667,10 +667,14 @@ if(!empty($v['placeholder'])){ $label=$v['placeholder']; }
   
     $txs=wc_get_attribute_taxonomies();
   $tx_arr=array();
-  $product_attrs=array('title'=>'Product Title','description'=>'Product Description','short_description'=>'Short Description','sku'=>'Product SKU','price'=>'Product Price','regular_price'=>'Product Regular Price','sale_price'=>'Product Sales Price','total_sales'=>'Product Total Sales','stock_quantity'=>'Stock Quantity','weight'=>'Product Weight','length'=>'Product Length','width'=>'Product Width','height'=>'Product Height','get_category_ids'=>'Product Categories','get_category'=>'Product First Category','get_tags'=>'Product Tags','get_tag'=>'Product First Tag','product_img'=>'Product Image URL','id'=>'ID');
+  $product_attrs=array('title'=>'Product Title','description'=>'Product Description','short_description'=>'Short Description','sku'=>'Product SKU','price'=>'Product Price','regular_price'=>'Product Regular Price','sale_price'=>'Product Sales Price','total_sales'=>'Product Total Sales','stock_quantity'=>'Stock Quantity','manage_stock'=>'Manage Stock','weight'=>'Product Weight','length'=>'Product Length','width'=>'Product Width','height'=>'Product Height','get_category_ids'=>'Product Categories','get_category'=>'Product First Category','get_tags'=>'Product Tags','get_tag'=>'Product First Tag','get_brands'=>'Product Brands','get_brand'=>'Product First Brand','product_img'=>'Product Image URL','id'=>'ID');
   
   foreach($product_attrs as $k=>$v){
       $tx_arr['__vxp_fun-'.$k]=array('label'=>$v);
+  }
+  $pro_customs=array('_cogs_total_value'=>'Cost Price','_manage_stock'=>'Manage Stock(yes,no)');
+    foreach($pro_customs as $k=>$v){
+      $tx_arr[$k]=array('label'=>$v);
   }
 
   $variation_attrs=array();
@@ -1509,7 +1513,7 @@ $sql.=' order_id=%d order by id desc limit %d';
 
   $time=time(); 
   $check=$force_check; $auto_check=false;
-  $api_check=isset($info['api_check']) ? (int)$info['api_check'] : 0;
+  $api_check=isset($info['api_check']) ? (int)$info['api_check'] : time();
   if(!$force_check && $api_check<$time){ //check validity period in settings tab
   $check=true; $auto_check=true;
   } 
