@@ -307,9 +307,9 @@ return $fields;
 
 public function get_fields_invoice($module){
     
-$json['invoices']='["reference_number","place_of_supply","gst_treatment","gst_no","template_id","date","payment_terms","payment_terms_label","due_date","discount","tax_total","shipping_charge","is_discount_before_tax","discount_type","is_inclusive_tax","exchange_rate","recurring_invoice_id","invoiced_estimate_id","salesperson_name","project_id","allow_partial_payments","notes","terms","adjustment","adjustment_description","reason","tax_authority_id","tax_exemption_id","invoice_number","tax_id","tax_treatment","vat_treatment","branch_id","reference_invoice_type","payment_options","allow_partial_payments","pricebook_id"]'; //recurringinvoices
+$json['invoices']='["reference_number","place_of_supply","gst_treatment","gst_no","template_id","date","payment_terms","payment_terms_label","due_date","discount","tax_total","shipping_charge","is_discount_before_tax","discount_type","is_inclusive_tax","exchange_rate","recurring_invoice_id","invoiced_estimate_id","salesperson_name","project_id","allow_partial_payments","notes","terms","adjustment","adjustment_description","reason","tax_authority_id","tax_exemption_id","invoice_number","tax_id","tax_treatment","vat_treatment","vat_reg_no","branch_id","reference_invoice_type","payment_options","allow_partial_payments","pricebook_id"]'; //recurringinvoices
  
- $json['salesorders']='["salesorder_number","reference_number","shipment_date","date","notes","terms","discount","shipping_charge","shipping_charge","is_discount_before_tax","discount_type","delivery_method","adjustment","adjustment_description","pricebook_id","salesperson_id","salesperson_name","is_inclusive_tax","exchange_rate","template_id","place_of_supply","gst_treatment","gst_no","tax_id","tax_treatment","branch_id","pricebook_id"]';
+ $json['salesorders']='["salesorder_number","reference_number","shipment_date","date","notes","terms","discount","shipping_charge","shipping_charge","is_discount_before_tax","discount_type","delivery_method","adjustment","adjustment_description","pricebook_id","salesperson_id","salesperson_name","is_inclusive_tax","exchange_rate","template_id","place_of_supply","gst_treatment","gst_no","tax_id","tax_treatment","vat_reg_no","branch_id","pricebook_id"]';
  
   $json['recurringinvoices']='["recurrence_name","start_date","end_date","recurrence_frequency","repeat_every","tax_id","email","gst_no","gst_treatment","place_of_supply","source_of_supply","destination_of_supply","abn","vendor_id","payment_terms","payment_terms_label","is_discount_before_tax","shipping_charge","adjustment","adjustment_description","quantity","unit","rate","description","name","discount","branch_id"]';
  
@@ -1846,6 +1846,9 @@ if(method_exists($item,'get_product')){
    $total=floatval($item->get_total());
    $total=round($total,2);
    $qty = $item->get_quantity()+$_order->get_qty_refunded_for_item( $item_id );  
+    if(!empty($meta['item_qty_custom'])){
+      $qty=(float)wc_get_order_item_meta($item->get_id(),$meta['item_qty_custom'],true); 
+     }
    $tax = $item->get_total_tax();
    if(!empty($tax) && !empty($qty)){
        $tax=floatval($tax)/$qty;

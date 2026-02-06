@@ -235,7 +235,6 @@ if( (isset($_POST['vx_test_connection']) || empty($info['access_token'])) && !em
  
  <?php
 if(!empty($info['access_token']) && self::$is_pr){ 
-
 $is_crm=false;  
 if(empty($info['type']) || $info['type'] == 'crmplus'){
  $is_crm=true;      
@@ -258,6 +257,7 @@ $res=$api->post_crm('settings/fields?module=Products');
    } 
       
 }else{
+
 $res=$api->post_crm('settings/taxes'); 
  if(!empty($res['taxes'])){
     $ops=array();

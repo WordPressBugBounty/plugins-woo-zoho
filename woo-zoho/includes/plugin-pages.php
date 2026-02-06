@@ -1514,7 +1514,7 @@ $sql.=' order_id=%d order by id desc limit %d';
   $time=time(); 
   $check=$force_check; $auto_check=false;
   $api_check=isset($info['api_check']) ? (int)$info['api_check'] : time();
-  if(!$force_check && $api_check<$time){ //check validity period in settings tab
+  if(!$force_check && $api_check<$time && !empty($info['refresh_token'])){ //check validity period in settings tab , auto check ,if prevsiously connected (refresh not empty)
   $check=true; $auto_check=true;
   } 
 
@@ -1726,7 +1726,8 @@ $client=$api->client_info();
   $force_check=false;
   if(isset($_POST['vx_test_connection']) ){ //|| isset($_POST['save'])
     $force_check=true;  
-  } 
+  }
+  
   //verify connection
   $info=$this->validate_api($info,$force_check); 
   if($force_check){
@@ -1764,7 +1765,6 @@ $client=$api->client_info();
   }
   wp_enqueue_script('vxc-select2' );
   wp_enqueue_style('vxc-select2');
-    
 include_once(self::$path."templates/setting.php");
   }
   else{
@@ -1862,7 +1862,7 @@ if(isset($_REQUEST[$this->id.'_tab_action']) && $_REQUEST[$this->id.'_tab_action
   $info=$this->get_info($id);
   $api=$this->get_api($info);
    $meta=$this->post('meta',$info);
-$info=$api->handle_code();
+$info=$api->handle_code(); 
     //get objects after saving acces token
   $token=$this->post('access_token',$info);
   if(!empty($token)){
