@@ -3,10 +3,10 @@ Contributors: crmperks, sbazzi, asif876
 Tags: zoho, woocommerce zoho, zoho books, zoho invoice, zoho inventory
 Requires at least: 4.7
 Tested up to: 6.9
-Stable tag: 1.6.0
-Version: 1.6.0
+Stable tag: 1.6.1
+Version: 1.6.1
 WC requires at least: 3.0
-WC tested up to: 10.4
+WC tested up to: 10.6
 Requires PHP: 5.3
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -173,6 +173,9 @@ This free zoho crm woocommerce plugin can create/update any object(contact,accou
 
 == Changelog ==
 
+
+= 1.6.1 =
+* added "tax_regime field" feature.
 
 = 1.6.0 =
 * added "vat_reg_no field" feature.
