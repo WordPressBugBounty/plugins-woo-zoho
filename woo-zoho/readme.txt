@@ -2,11 +2,11 @@
 Contributors: crmperks, sbazzi, asif876
 Tags: zoho, woocommerce zoho, zoho books, zoho invoice, zoho inventory
 Requires at least: 4.7
-Tested up to: 6.9
+Tested up to: 7.1
 Stable tag: 1.6.2
 Version: 1.6.2
 WC requires at least: 3.0
-WC tested up to: 10.7
+WC tested up to: 11.0
 Requires PHP: 5.3
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
